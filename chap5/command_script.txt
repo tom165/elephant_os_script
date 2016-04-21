@@ -1,0 +1,77 @@
+chap5:
+
+=======================第一部分  获得机器内存====================
+//复制便于修改
+mkdir chap5
+cd chap5
+cp ../chap4/mbr_v2.S mbr.S
+cp ../chap4/loader.S loader.S
+
+mkdir include
+cp ../chap4/include/boot/inc include/boot.inc
+
+//修改jmp指令 jmp LOADER_BASE_ADDR+0x300
+vi mbr.S   
+
+vi loader.S
+nasm -I include/ -o mbr.bin mbr.S
+nasm -I include/ -o loader.bin loader.S
+
+
+cd ..
+cd ..
+dd if=myos/chap5/mbr.bin of=hd60M.img bs=512 count=1 conv=notrunc  // 修改mbr，读取多个扇区数据
+
+dd if=myos/chap5/loader.bin of=hd60M.img bs=512 count=2 seek=2 conv=notrunc   //写入loader
+
+bin/bochs -f bochsrc.disk
+
+//xp 0xb00
+可查看已获得内存大小32M
+
+
+
+
+
+=======================第二部分  进行内存分页====================
+
+
+vi loader.S
+vi include/boot.inc
+nasm -I include/ -o loader.bin loader.S
+
+cd /root/bochs
+dd if=myos/chap5/loader.bin of=hd60M.img bs=512 count=3 seek=2 conv=notrunc   //写入loader
+bin/bochs -f bochsrc.disk
+已进行了分页 
+
+
+
+
+=======================第三部分  测试加载内核====================
+
+
+加载kernel.bin
+cd /root/bochs/chap5
+mkdir c
+cd c
+mkdir kernel
+cd kernel
+vi main.c
+gcc -c -o main.o main.c
+ld main.o -Ttext 0xc0001500 -e main -o kernel.bin
+dd if=kernel.bin of=/root/bin/hd60M.img bs=512 count=200  seek=9 conv=notrunc //写入kernel
+
+cd ..
+cp ../b/loader.S  loader.S
+vi loader.S
+mkdir include
+cp ../b/include/boot.inc include/boot.inc
+vi include/boot.inc
+nasm -I include/ -o loader.bin loader.S
+
+cd /root/bochs
+dd if=loader.bin of=/root/bin/hd60M.img bs=512 count=3 seek=2 conv=notrunc   //写入loader
+cd /root/bochs
+bin/bochs -f bochsrc.disk
+

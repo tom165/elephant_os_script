@@ -1,0 +1,87 @@
+chap6 
+
+===============================第一部分，实现put_char=========================
+cd /root/bochs/myos
+mkdir chap6
+cd chap6
+mkdir a
+cd a
+mkdir lib
+cd lib
+vi stdint.h
+mkdir kernel
+cd kernel
+vi print.S
+vi print.h
+nasm -f elf -o print.o print.S
+
+cd /root/bochs/myos/chap6/a
+mkdir kernel
+vi main.c
+cd ..
+gcc -I lib/kernel/ -c -o kernel/main.o kernel/main.c
+
+ld -Ttext 0xc0001500 -e main -o kernel.bin kernel/main.o lib/kernel/print.o
+
+dd id=kernel.bin of=/root/bochs/hd60M.img bs=512 count=200 seek=9 conv=notrinc
+
+cd /root/bochs
+bin/bochs -f bochsrc.disk
+
+=====================================第二部分,实现put_str==================================
+
+cd /root/bochs/myos/chap6
+mkdir b
+cd b
+mkdir lib
+cd lib
+cp /root/bochs/myos/chap6/a/lib/stdint.h stdint.h
+mkdir kernel
+cd kernel
+cp /root/bochs/myos/chap6/a/lib/kernel/print.S  print.S
+cp /root/bochs/myos/chap6/a/lib/kernel/print.h  print.h
+vi print.S
+vi print.h
+nasm -f elf -o print.o print.S
+
+cd /root/bochs/myos/chap6/b
+mkdir kernel
+vi main.c
+cd ..
+gcc -I lib/kernel/ -c -o kernel/main.o kernel/main.c
+
+ld -Ttext 0xc0001500 -e main -o kernel.bin kernel/main.o lib/kernel/print.o
+
+dd id=kernel.bin of=/root/bochs/hd60M.img bs=512 count=200 seek=9 conv=notrinc
+
+cd /root/bochs
+bin/bochs -f bochsrc.disk
+
+=====================================第三部分,实现put_int===================================
+
+cd /root/bochs/myos/chap6
+mkdirc
+cdc
+mkdir lib
+cd lib
+cp /root/bochs/myos/chap6/a/lib/stdint.h stdint.h
+mkdir kernel
+cd kernel
+cp /root/bochs/myos/chap6/b/lib/kernel/print.S  print.S
+cp /root/bochs/myos/chap6/b/lib/kernel/print.h  print.h
+vi print.S
+vi print.h
+nasm -f elf -o print.o print.S
+
+cd /root/bochs/myos/chap6/c
+mkdir kernel
+vi main.c
+cd ..
+gcc -I lib/kernel/ -c -o kernel/main.o kernel/main.c
+
+ld -Ttext 0xc0001500 -e main -o kernel.bin kernel/main.o lib/kernel/print.o
+
+dd id=kernel.bin of=/root/bochs/hd60M.img bs=512 count=200 seek=9 conv=notrinc
+
+cd /root/bochs
+bin/bochs -f bochsrc.disk

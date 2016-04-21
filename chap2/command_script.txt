@@ -1,0 +1,12 @@
+/root/bochs下创建myos/chap2 目录，存放每章文件，以后每章类似
+mkdir myos
+mkdir chap2
+
+生成mbr.S, 在编译成mbr.bin,写入硬盘中
+
+vi mbr.S
+nasm -o mbr.bin mbr.S
+cd /root/bochs
+dd if=myos/chap2/mbr.bin of=hd60M.img bs=512 count=1 conv=notrunc
+bin/bochs -f bochsrc.disk
+

@@ -1,0 +1,26 @@
+chap4:
+
+//复制便于修改
+mkdir chap4
+cd chap4
+cp ../chap3/mbr_v2.S mbr.S
+cp ../chap3/loader.S loader.S
+
+mkdir include
+cp ../chap3/include/boot/inc include/boot.inc
+
+vi mbr.S
+nasm -I include/ -o mbr.bin mbr_v2.S
+cd ..
+cd ..
+dd if=myos/chap4/mbr.bin of=hd60M.img bs=512 count=1 conv=notrunc  // 修改mbr，读取多个扇区数据
+
+cd myos/chap4
+vi loader.S
+nasm -I include/ -o loader.bin loader.S
+cd ..
+cd ..
+dd if=myos/chap4/loader.bin of=hd60M.img bs=512 count=2 seek=2 conv=notrunc   //写入loader
+
+bin/bochs -f bochsrc.disk
+

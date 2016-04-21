@@ -1,0 +1,31 @@
+chap3:
+
+mkdir chap3
+
+生成mbr.S, 在编译成mbr.bin,写入硬盘中
+
+vi mbr.S
+nasm -o mbr.bin mbr.S
+cd /root/bochs
+dd if=myos/chap3/mbr.bin of=hd60M.img bs=512 count=1 conv=notrunc
+bin/bochs -f bochsrc.disk
+
+cd myos/chap3
+cp mbr.S mbr_v2.S
+vi mbr_v2.S
+mkdir include
+vi include/boot.inc
+
+nasm -I include/ -o mbr.bin mbr_v2.S
+cd ..
+cd ..
+dd if=myos/chap3/mbr.bin of=hd60M.img bs=512 count=1 conv=notrunc
+
+cd myos/chap3
+vi loader.S
+nasm -I include/ -o loader.bin loader.S
+cd ..
+cd ..
+dd if=myos/chap3/loader.bin of=hd60M.img bs=512 count=1 seek=2 conv=notrunc
+bin/bochs -f bochsrc.disk
+
