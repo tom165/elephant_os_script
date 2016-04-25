@@ -1,0 +1,81 @@
+﻿chap7 
+
+===============================第一部分=========================
+cd /root/bochs/myos
+mkdir chap7
+cd chap7
+mkdir a
+cd a
+mkdir lib
+cd lib
+cp /root/bochs/myos/chap6/c/lib/stdint.h stdint.h
+
+mkdir kernel
+cd kernel
+cp /root/bochs/myos/chap6/c/lib/kernel/print.S print.S
+cp /root/bochs/myos/chap6/c/lib/kernel/print.h print.h
+vi io.h
+cd ..
+cd ..
+mkdir kernel
+vi global.h
+vi init.h
+vi init.c
+vi main.c
+vi kernel.S
+vi interrupt.c
+vi interrupt.h
+
+cd ..
+mkdir build
+
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/main.o kernel/main.c
+nasm -f elf -o build/print.o lib/kernel/print.S
+nasm -f elf -o build/kernel.o kernel/kernel.S
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/interrupt.o kernel/interrupt.c
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/init.o kernel/init.c
+
+ld -Ttext 0xc0001500 -e main -o build/kernel.bin build/main.o build/init.o build/interrupt.o build/print.o build/kernel.o
+dd id=build/kernel.bin of=/root/bochs/hd60M.img bs=512 count=200 seek=9 conv=notrinc
+
+cd /root/bochs
+bin/bochs -f bochsrc.disk
+
+
+=====================================第二部分==================================
+
+cd /root/bochs/myos/chap7
+mkdir b
+cd b
+
+mkdir build
+mkdir kernel
+mkdir lib
+cd lib
+mkdir kernel
+cp /root/bochs/myos/chap7/a/lib/stdint.h stdint.h
+cp /root/bochs/myos/chap7/a/lib/kernel/io.h  kernel/io.h
+cp /root/bochs/myos/chap7/a/lib/kernel/print.h  kernel/print.h
+cp /root/bochs/myos/chap7/a/lib/kernel/print.S  kernel/print.S
+cd  kernel
+cp /root/bochs/myos/chap7/a/kernel/*.*  .
+vi interrupt.c
+vi kernel.S
+
+
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/main.o kernel/main.c
+nasm -f elf -o build/print.o lib/kernel/print.S
+nasm -f elf -o build/kernel.o kernel/kernel.S
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/interrupt.o kernel/interrupt.c
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/init.o kernel/init.c
+
+ld -Ttext 0xc0001500 -e main -o build/kernel.bin build/main.o build/init.o build/interrupt.o build/print.o build/kernel.o
+dd id=build/kernel.bin of=/root/bochs/hd60M.img bs=512 count=200 seek=9 conv=notrinc
+
+cd /root/bochs
+bin/bochs -f bochsrc.disk
+
+
+
+=====================================第三部分===================================
+
