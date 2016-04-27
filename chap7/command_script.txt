@@ -53,16 +53,15 @@ mkdir kernel
 mkdir lib
 cd lib
 mkdir kernel
-cp /root/bochs/myos/chap7/a/lib/stdint.h stdint.h
-cp /root/bochs/myos/chap7/a/lib/kernel/io.h  kernel/io.h
-cp /root/bochs/myos/chap7/a/lib/kernel/print.h  kernel/print.h
-cp /root/bochs/myos/chap7/a/lib/kernel/print.S  kernel/print.S
+cd ..
+cp /root/bochs/myos/chap7/a/lib/stdint.h lib/stdint.h
+cp /root/bochs/myos/chap7/a/lib/kernel/*.*  lib/kernel/.
+cp /root/bochs/myos/chap7/a/kernel/*.*  kernel/.
 cd  kernel
-cp /root/bochs/myos/chap7/a/kernel/*.*  .
 vi interrupt.c
 vi kernel.S
 
-
+cd ..
 gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/main.o kernel/main.c
 nasm -f elf -o build/print.o lib/kernel/print.S
 nasm -f elf -o build/kernel.o kernel/kernel.S
@@ -78,4 +77,41 @@ bin/bochs -f bochsrc.disk
 
 
 =====================================第三部分===================================
+
+cd /root/bochs/myos/chap7
+mkdir c
+cd c
+
+mkdir device
+vi timer.h
+vi timer.c
+
+mkdir build
+mkdir kernel
+mkdir lib
+cd lib
+mkdir kernel
+cd ..
+cp /root/bochs/myos/chap7/b/lib/stdint.h lib/stdint.h
+cp /root/bochs/myos/chap7/b/lib/kernel/*.* lib/kernel/.
+cp /root/bochs/myos/chap7/b/kernel/*.*  kernel/.
+cd kernel
+vi init.c
+
+cd ..
+gcc -I lib/kernel/  -c  -o build/timer.o device/timer.c
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/main.o kernel/main.c
+nasm -f elf -o build/print.o lib/kernel/print.S
+nasm -f elf -o build/kernel.o kernel/kernel.S
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/interrupt.o kernel/interrupt.c
+gcc -I lib/kernel/ -I lib/ -I kernel/ -c fno-builtin -o build/init.o kernel/init.c
+
+ld -Ttext 0xc0001500 -e main -o build/kernel.bin build/main.o build/init.o build/interrupt.o build/print.o build/kernel.o  build/timer.o
+dd id=build/kernel.bin of=/root/bochs/hd60M.img bs=512 count=200 seek=9 conv=notrinc
+
+cd /root/bochs
+bin/bochs -f bochsrc.disk
+
+
+
 
